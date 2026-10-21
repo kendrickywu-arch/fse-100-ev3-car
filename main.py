@@ -5,13 +5,15 @@ from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import Motor
 from pybricks.parameters import Port
 from pybricks.robotics import DriveBase
+from pybricks.ev3devices import TouchSensor
 
 #Initialize EV3 components
 ev3 = EV3Brick()
-left_motor = Motor(Port.C)
-right_motor = Motor(Port.D)
+left_motor = Motor(Port.D)
+right_motor = Motor(Port.A)
 #weapon = Motor(Port.A)
 robot = DriveBase(left_motor, right_motor, wheel_diameter = 55.5, axle_track = 104)
+touch_sensor = TouchSensor(Port.S4)
 
 #Server configuration
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,14 +21,25 @@ server_socket.bind(("0.0.0.0", 12345))
 server_socket.listen(1)
 print("Waiting for connection...")
 client_socket, address = server_socket.accept()
+client_socket.settimeout(0.1)
 print("Connected to {}".format(address))
 
 try:
     while True:
+        if touch_sensor.pressed():
+            ev3.speaker.beep()
+            break
 
-        command = client_socket.recv(2).decode()
+        try:
+            command = client_socket.recv(2).decode()
+        except OSError:
+            # A socket timeout lets the loop check the touch sensor again.
+            continue
+
         if not command:
             break
+        if len(command) != 2:
+            continue
 
         key, action = command[0], command[1]
         if action == "d": #Key press
@@ -39,7 +52,7 @@ try:
             elif key == "d":
                 robot.drive(0, 450) #Turn right
             elif key == "f":
-               brick.beep();
+                ev3.speaker.beep() #Make a beep noise
         elif action == "u": #Key release
             if key in ("w", "a", "s", "d"):
                 robot.stop() # Stop the robot on key release
@@ -47,5 +60,6 @@ try:
             #    weapon.stop() # Stop the weapon motor on key release
 
 finally:
+    robot.stop()
     client_socket.close()
     server_socket.close()

@@ -36,4 +36,4 @@ try:
 
 except KeyboardInterrupt:
 # Graceful exit when user interrupts the program
-ev3.speaker.beep(frequency=500, duration=50)
+# ev3.speaker.beep(frequency=500, duration=50)
