@@ -2,20 +2,18 @@
 #main.py
 import socket
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import Motor
-from pybricks.parameters import Port
+from pybricks.parameters import Port, Color
 from pybricks.robotics import DriveBase
-from pybricks.ev3devices import TouchSensor
-from pybricks.tools import StopWatch
+from pybricks.ev3devices import TouchSensor, ColorSensor, Motor
 
 #Initialize EV3 components
 ev3 = EV3Brick()
 left_motor = Motor(Port.D)
 right_motor = Motor(Port.A)
-#weapon = Motor(Port.A)
+weapon = Motor(Port.B)
 robot = DriveBase(left_motor, right_motor, wheel_diameter = 55.5, axle_track = 104)
 touch_sensor = TouchSensor(Port.S4)
-beep_timer = StopWatch()
+color_sensor = ColorSensor(Port.S1)
 
 #Server configuration
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,15 +26,12 @@ print("Connected to {}".format(address))
 
 try:
     while True:
-        # Kill switch stops the robot when the touch sensor is pressed
         if touch_sensor.pressed():
+            ev3.speaker.beep(2000)
             break
 
-        # Beep every 5 seconds until the kill switch is pressed
-        if beep_timer.time() > 5000:
-            ev3.speaker.beep(1000, 500)
-            beep_timer.reset()
-
+        #if 
+        
         try:
             command = client_socket.recv(2).decode()
         except OSError:
@@ -59,12 +54,16 @@ try:
             elif key == "d":
                 robot.drive(0, 450) #Turn right
             elif key == "f":
-                ev3.speaker.beep(1000, 500) #Make a beep noise
+                #ev3.speaker.beep(500) #Make a beep noise
+                weapon.run(100)
+            elif key == "g":
+                #ev3.speaker.beep(1000) #Make a beep noise
+                weapon.run(-100)
         elif action == "u": #Key release
             if key in ("w", "a", "s", "d"):
                 robot.stop() # Stop the robot on key release
-            #elif key == "f":
-            #    weapon.stop() # Stop the weapon motor on key release
+            elif key in ("f", "g"):
+                weapon.stop() # Stop the weapon motor on key release
 
 finally:
     robot.stop()

@@ -16,14 +16,14 @@ def control_ev3(ev3_ip, ev3_port):
 
     def on_press(key):
         try:
-            if key.char in ("w", "a", "s", "d", "f"):
+            if key.char in ("w", "a", "s", "d", "f", "g"):
                 command = f"{key.char}d".encode() #'d' for key down
                 client_socket.send(command)
         except AttributeError:
             pass # Ignore special keys
     def on_release(key):
         try:
-            if key.char in ("w", "a", "s", "d", "f"):
+            if key.char in ("w", "a", "s", "d", "f", "g"):
                 command = f"{key.char}u".encode() #'u' for key up
                 client_socket.send(command)
 
@@ -45,6 +45,6 @@ def control_ev3(ev3_ip, ev3_port):
 
 # Example usage
 if __name__ == "__main__":
-    EV3_IP = "192.168.0.33" #Replace with your EV3's IP address
+    EV3_IP = "192.168.0.34" #Replace with your EV3's IP address
     EV3_PORT = 12345
     control_ev3(EV3_IP, EV3_PORT)

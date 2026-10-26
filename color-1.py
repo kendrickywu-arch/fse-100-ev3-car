@@ -6,7 +6,7 @@ from pybricks.tools import wait
 
 # Initialize the EV3 brick and color sensor
 ev3 = EV3Brick()
-color_sensor = ColorSensor (Port.S4) # Adjust port if needed
+color_sensor = ColorSensor(Port.S1) # Adjust port if needed
 
 # Define a dictionary for color-to-frequency mapping
 color_beep_frequencies = {
@@ -36,4 +36,4 @@ try:
 
 except KeyboardInterrupt:
 # Graceful exit when user interrupts the program
-# ev3.speaker.beep(frequency=500, duration=50)
+ ev3.speaker.beep(frequency=500, duration=50)
