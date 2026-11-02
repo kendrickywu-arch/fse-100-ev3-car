@@ -4,7 +4,7 @@ import socket
 from pybricks.hubs import EV3Brick
 from pybricks.parameters import Port, Color
 from pybricks.robotics import DriveBase
-from pybricks.ev3devices import TouchSensor, ColorSensor, Motor
+from pybricks.ev3devices import TouchSensor, ColorSensor, UltrasonicSensor, Motor
 from pybricks.tools import wait
 
 #Initialize EV3 components
@@ -15,8 +15,11 @@ weapon = Motor(Port.B)
 robot = DriveBase(left_motor, right_motor, wheel_diameter = 55.5, axle_track = 104)
 touch_sensor = TouchSensor(Port.S4)
 color_sensor = ColorSensor(Port.S1)
+distance_sensor = UltrasonicSensor(Port.S2)
 color_sensing_mode = False
 auto_mode = False
+touch_handled = False
+last_auto_color = None
 
 #Server configuration
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,39 +42,44 @@ color_beep_frequencies = {
 
 try:
     while True:
-        if touch_sensor.pressed():
-            ev3.speaker.beep(2000)
-            break
 
-        if color_sensing_mode:
+        if auto_mode:
             color = color_sensor.color()
+            if touch_sensor.pressed():
+                if not touch_handled:
+                    robot.stop()
+                    if (touch_sensor.distance() > 1500):
+                        robot.drive(0,-100)
+                    else:
+                        robot.drive(0, 100)
+                    wait(1720)
+                    robot.stop()
+                    touch_handled = True
+            else:
+                touch_handled = False
 
-            #if color in color_beep_frequencies:
-                #ev3.speaker.beep(color_beep_frequencies[color], duration=50)
-            if color == Color.RED:
+            if color in color_beep_frequencies and color != last_auto_color:
                 robot.stop()
-                wait(1000)
-                #if auto_mode:
-                #    robot.drive(50)
-            elif color == Color.BLUE:
-                robot.stop()
-                ev3.speaker.beep(670, 50)
-                wait(500)
-                ev3.speaker.beep(670, 50)
-                #if auto_mode:
-                #    robot.drive(50)
-            elif color == Color.GREEN:
-                robot.stop()
-                ev3.speaker.beep(890, 50)
-                wait(500)
-                ev3.speaker.beep(890, 50)
-                wait(500)
-                ev3.speaker.beep(890, 50)
-                #if auto_mode:
-                #    robot.drive(50)
-            #else:
-                #ev3.speaker.beep(100, duration=50) # Default beep for unknown colors
-        
+                if color == Color.RED:
+                    wait(1000)
+                elif color == Color.BLUE:
+                    ev3.speaker.beep(670, 50)
+                    wait(500)
+                    ev3.speaker.beep(670, 50)
+                elif color == Color.GREEN:
+                    ev3.speaker.beep(890, 50)
+                    wait(500)
+                    ev3.speaker.beep(890, 50)
+                    wait(500)
+                    ev3.speaker.beep(890, 50)
+                else:
+                    ev3.speaker.beep(color_beep_frequencies[color], duration=50)
+                last_auto_color = color
+            elif color not in color_beep_frequencies:
+                last_auto_color = None
+
+            robot.drive(-50, 0)
+
         try:
             command = client_socket.recv(2).decode()
         except OSError:
@@ -84,15 +92,11 @@ try:
             continue
 
         key, action = command[0], command[1]
-        if auto_mode:
-            robot.drive(50, 0)
-            
-
         if action == "d": #Key press
             if key == "w":
-                robot.drive(200, 0) #Move forward
+                robot.drive(-200, 0) #Move forward
             elif key == "s":
-                robot.drive(-200, 0) #Move backward
+                robot.drive(200, 0) #Move backward
             elif key == "a":
                 robot.drive(0, -100) #Turn left
             elif key == "d":
@@ -107,6 +111,12 @@ try:
                 color_sensing_mode = not color_sensing_mode
             elif key == "p":
                 auto_mode = not auto_mode
+                robot.stop()
+            elif key == "l":
+            #    for i in range(distance_sensor.distance()/100):
+            #        ev3.speaker.beep(999)
+                robot.drive(0, 100)
+                wait(1720)
                 robot.stop()
 
         elif action == "u": #Key release
