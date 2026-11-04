@@ -31,13 +31,9 @@ client_socket.settimeout(0.1)
 print("Connected to {}".format(address))
 
 color_beep_frequencies = {
-    Color.BLACK: 200,   # Black -> 200 Hz
     Color.BLUE: 400,    # Blue -> 400 Hz
     Color.GREEN: 600,   # Green -> 600 Hz
-    Color.YELLOW: 800, # Yellow -> 800 Hz
     Color.RED: 1000,    # Red -> 1000 Hz
-    Color.WHITE: 1200,  # White -> 1200 Hz
-    Color.BROWN: 1400   # Brown -> 1400 Hz
 }
 
 try:
@@ -48,10 +44,12 @@ try:
             if touch_sensor.pressed():
                 if not touch_handled:
                     robot.stop()
-                    if (touch_sensor.distance() > 1500):
+                    if distance_sensor.distance() >= 450:
+                        #probot.turn(90)
                         robot.drive(0,-100)
                     else:
-                        robot.drive(0, 100)
+                        #robot.turn(-90)
+                        robot.drive(0,100)
                     wait(1720)
                     robot.stop()
                     touch_handled = True
@@ -72,13 +70,11 @@ try:
                     ev3.speaker.beep(890, 50)
                     wait(500)
                     ev3.speaker.beep(890, 50)
-                else:
-                    ev3.speaker.beep(color_beep_frequencies[color], duration=50)
                 last_auto_color = color
             elif color not in color_beep_frequencies:
                 last_auto_color = None
 
-            robot.drive(-50, 0)
+            robot.drive(-100, 0)
 
         try:
             command = client_socket.recv(2).decode()
@@ -94,19 +90,17 @@ try:
         key, action = command[0], command[1]
         if action == "d": #Key press
             if key == "w":
-                robot.drive(-200, 0) #Move forward
+                robot.drive(-100, 0) #Move forward
             elif key == "s":
-                robot.drive(200, 0) #Move backward
+                robot.drive(100, 0) #Move backward
             elif key == "a":
-                robot.drive(0, -100) #Turn left
+                robot.drive(0, -50) #Turn left
             elif key == "d":
-                robot.drive(0, 100) #Turn right
+                robot.drive(0, 50) #Turn right
             elif key == "f":
-                #ev3.speaker.beep(500) #Make a beep noise
-                weapon.run(100)
+                weapon.run(100) #Forklift up
             elif key == "g":
-                #ev3.speaker.beep(1000) #Make a beep noise
-                weapon.run(-100)
+                weapon.run(-100) #Forklift down
             elif key == "c":
                 color_sensing_mode = not color_sensing_mode
             elif key == "p":
@@ -115,7 +109,8 @@ try:
             elif key == "l":
             #    for i in range(distance_sensor.distance()/100):
             #        ev3.speaker.beep(999)
-                robot.drive(0, 100)
+                robot.drive(0,100)
+                #robot.turn(90)
                 wait(1720)
                 robot.stop()
 
