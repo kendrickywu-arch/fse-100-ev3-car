@@ -7,12 +7,12 @@ from pybricks.robotics import DriveBase
 from pybricks.ev3devices import TouchSensor, ColorSensor, UltrasonicSensor, Motor
 from pybricks.tools import wait
 
-#Initialize EV3 components
+#Initialize EV3 componentAs
 ev3 = EV3Brick()
 left_motor = Motor(Port.D)
 right_motor = Motor(Port.A)
 weapon = Motor(Port.B)
-robot = DriveBase(left_motor, right_motor, wheel_diameter = 55.5, axle_track = 104)
+robot = DriveBase(left_motor, right_motor, wheel_diameter = 55, axle_track = 175)
 touch_sensor = TouchSensor(Port.S4)
 color_sensor = ColorSensor(Port.S1)
 distance_sensor = UltrasonicSensor(Port.S2)
@@ -45,11 +45,11 @@ try:
                 if not touch_handled:
                     robot.stop()
                     if distance_sensor.distance() >= 450:
-                        #probot.turn(90)
-                        robot.drive(0,-100)
+                        robot.turn(-90)
+                        #robot.drive(0,-100)
                     else:
-                        #robot.turn(-90)
-                        robot.drive(0,100)
+                        robot.turn(90)
+                        #robot.drive(0,100)
                     wait(1720)
                     robot.stop()
                     touch_handled = True
