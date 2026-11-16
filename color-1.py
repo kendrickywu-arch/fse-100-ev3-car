@@ -21,19 +21,19 @@ color_beep_frequencies = {
 
 try:
     while True:
-        # Get the detected color
+        #get detected color
         color = color_sensor.color()
 
-        # Check if the detected color has a corresponding beep frequency
+        #check if the detected color has a corresponding beep frequency
         if color in color_beep_frequencies:
-            # Play the beep with the corresponding frequency
+            #play the beep with the corresponding frequency
             ev3.speaker.beep(frequency=color_beep_frequencies [color], duration=50)
         else:
-            # Beep with a default frequency for unknown colors
+            #beep with a default frequency for unknown colors
             ev3.speaker.beep(frequency=100, duration=50)
 
-        # Wait briefly before the next reading
+        #wait briefly before the next reading
 
 except KeyboardInterrupt:
-# Graceful exit when user interrupts the program
+#exit when user interrupts the program
  ev3.speaker.beep(frequency=500, duration=50)
