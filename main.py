@@ -52,9 +52,10 @@ try:
                         wait(100)
                         robot.drive(100, 0)
                         wait(1000)
-                        while gyro_sensor.angle() > -85:
+                        while gyro_sensor.angle() > -70:
                             robot.drive(0,-50)
                             #wait(10)
+                        #gyro_sensor.reset_angle(0)
                     else:
                         #robot.turn(100)
                         #robot.drive(0,100)
@@ -62,9 +63,10 @@ try:
                         wait(100)
                         robot.drive(100, 0)
                         wait(1000)
-                        while gyro_sensor.angle() < 85:
+                        while gyro_sensor.angle() < 115:
                             robot.drive(0,50)
                             #wait(10)
+                        #gyro_sensor.reset_angle(0)
 
                     robot.stop()
                     #wait(200)
@@ -89,8 +91,19 @@ try:
                 last_auto_color = color
             elif color not in color_beep_frequencies:
                 last_auto_color = None
+            
+            if distance_sensor.distance() > 750:
+                wait(2000)
+                gyro_sensor.reset_angle(0)
+                while gyro_sensor.angle() > -75:
+                    robot.drive(0,-50)
+                    #wait(10)
+                #gyro_sensor.reset_angle(0)
+                robot.drive(-100, 0)
+                wait(3000)
 
             robot.drive(-100, 0)
+            
 
         try:
             command = client_socket.recv(2).decode()
@@ -120,6 +133,7 @@ try:
             elif key == "c":
                 color_sensing_mode = not color_sensing_mode
             elif key == "p":
+                gyro_sensor.reset_angle(0)
                 auto_mode = not auto_mode
                 robot.stop()
             #elif key == "l":
