@@ -35,6 +35,8 @@ color_beep_frequencies = {
     Color.BLUE: 400,    #blue = 400 Hz
     Color.GREEN: 600,   #green = 600 Hz
     Color.RED: 1000,    #red = 1000 Hz
+    Color.YELLOW: 700
+    #Color.DARK_BLUE: 300
 }
 
 try:
@@ -53,9 +55,11 @@ try:
                         robot.drive(100, 0)
                         wait(1000)
                         while gyro_sensor.angle() > -70:
-                            robot.drive(0,-50)
+                            robot.drive(0,-50)# -(50/(gyro_sensor.angle() + 1)))
                             #wait(10)
                         #gyro_sensor.reset_angle(0)
+                        robot.drive(100, 0)
+                        wait(3000)
                     else:
                         #robot.turn(100)
                         #robot.drive(0,100)
@@ -63,8 +67,8 @@ try:
                         wait(100)
                         robot.drive(100, 0)
                         wait(1000)
-                        while gyro_sensor.angle() < 115:
-                            robot.drive(0,50)
+                        while gyro_sensor.angle() < 110:
+                            robot.drive(0,50)# + (50/(gyro_sensor.angle() + 1)))
                             #wait(10)
                         #gyro_sensor.reset_angle(0)
 
@@ -92,11 +96,11 @@ try:
             elif color not in color_beep_frequencies:
                 last_auto_color = None
             
-            if distance_sensor.distance() > 750:
-                wait(2000)
+            if distance_sensor.distance() > 450:
+                wait(3000)
                 gyro_sensor.reset_angle(0)
-                while gyro_sensor.angle() > -75:
-                    robot.drive(0,-50)
+                while gyro_sensor.angle() > -70:
+                    robot.drive(0, -50)# - (50/(gyro_sensor.angle() + 1)))
                     #wait(10)
                 #gyro_sensor.reset_angle(0)
                 robot.drive(-100, 0)
